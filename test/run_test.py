@@ -1190,10 +1190,9 @@ def main():
         if err_message is None:
             return True
         failure_messages.append(err_message)
+        print_to_stderr(err_message)
         if not options.continue_through_error:
             pool.terminate()
-            raise RuntimeError(err_message)
-        print_to_stderr(err_message)
         return False
 
     try:
@@ -1203,6 +1202,9 @@ def main():
                              copy.deepcopy(options)), callback=success_callback)
         pool.close()
         pool.join()
+
+        if not options.continue_through_error and len(failure_messages) != 0:
+            sys.exit(1)
 
         del os.environ['PARALLEL_TESTING']
 
