@@ -1202,11 +1202,10 @@ def main():
                              copy.deepcopy(options)), callback=success_callback)
         pool.close()
         pool.join()
+        del os.environ['PARALLEL_TESTING']
 
         if not options.continue_through_error and len(failure_messages) != 0:
-            sys.exit(1)
-
-        del os.environ['PARALLEL_TESTING']
+            raise RuntimeError("\n".join(failure_messages))
 
         for test in selected_tests_serial:
             options_clone = copy.deepcopy(options)
@@ -1235,7 +1234,7 @@ def main():
                 if not PYTORCH_COLLECT_COVERAGE:
                     cov.html_report()
 
-    if options.continue_through_error and len(failure_messages) != 0:
+    if len(failure_messages) != 0:
         for err in failure_messages:
             print_to_stderr(err)
         sys.exit(1)
