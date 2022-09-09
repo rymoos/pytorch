@@ -892,6 +892,12 @@ def compiled_with_cxx11_abi():
 from torch._ops import ops
 from torch._classes import classes
 
+# decompositions_for_jvp depends on torch.ops
+# Registers decompositions for jvp to the jit registry
+if os.environ.get("PYTORCH_JIT", "1") == "1":
+    from torch._decomp import decompositions_for_jvp
+    del decompositions_for_jvp
+
 # quantization depends on torch.fx
 # Import quantization
 from torch import quantization as quantization
